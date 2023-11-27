@@ -13,3 +13,8 @@ async def root():
 async def file():
     headers = {"Content-Disposition": "attachment; filename=index.html"}
     return FileResponse("response.html", headers=headers)
+
+
+@app.get("/multiply")
+async def multiply(num1: int, num2: int):
+    return {"result": num1 * num2}
