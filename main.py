@@ -11,4 +11,5 @@ async def root():
 
 @app.get("/file/")
 async def file():
-    return FileResponse("response.html")
+    headers = {"Content-Disposition": "attachment; filename=index.html"}
+    return FileResponse("response.html", headers=headers)
