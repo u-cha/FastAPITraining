@@ -1,4 +1,5 @@
-from typing import List
+from typing import List, Optional
+import re
 
 import uvicorn
 from fastapi import FastAPI
@@ -6,6 +7,7 @@ from fastapi.responses import FileResponse
 
 from app.models import User
 from app.models.feedback import Feedback
+from app.models.product import Product
 from app.models.user import UserAgeResponse, UserCreate
 
 app = FastAPI()
@@ -19,6 +21,9 @@ users = {1: "ana de armas",
 users_extended: List[UserCreate] = []
 
 feedback_storage = {}
+
+products = {1: Product(product_id=1, name="Smartphone", category="Electronics", price=223.1),
+            2: Product(product_id=2, name="Smartphone", category="Electronics", price=333.1),}
 
 
 @app.get("/")
@@ -71,6 +76,21 @@ async def create_user(user: UserCreate):
     users_extended.append(user)
     return user
 
+
+@app.get("/product/{product_id}")
+async def get_product(product_id: int):
+    return products.get(product_id, {"error": f"no product with id {product_id}"})
+
+
+@app.get("/products/search/")
+async def search_product(keyword: str, category: Optional[str] = None, limit: int = 10):
+    product_list = products.values()
+    filtered_list = list(filter(lambda p: re.search(keyword.lower(), p.name.lower()), product_list))
+    if category:
+        filtered_list = list(filter(lambda p: re.match(category, p.category), filtered_list))
+    if limit:
+        filtered_list = filtered_list[:limit]
+    return filtered_list
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8080, reload=True, workers=1)
