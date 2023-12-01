@@ -7,7 +7,11 @@ from app.models.user import UserAgeResponse
 
 app = FastAPI()
 
-users = {1: "ana de armas", 2: "paul gautier"}
+users = {1: "ana de armas",
+         2: "paul gautier",
+         3: "lenny kravitz",
+         4: "hp baxxter",
+         5: "morgen shtern", }
 
 
 @app.get("/")
@@ -21,6 +25,11 @@ def get_user(user_id: int):
     if user is None:
         return {"error": f"user with id {user_id} not found"}
     return {user_id: user}
+
+
+@app.get("/users/")
+def get_users(limit: int = 0):
+    return dict(list(users.items())[:limit]) if limit else users
 
 
 @app.get("/file/")
