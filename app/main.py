@@ -7,14 +7,24 @@ from app.models.user import UserAgeResponse
 
 app = FastAPI()
 
+users = {1: "ana de armas", 2: "paul gautier"}
+
 
 @app.get("/")
 async def root():
     return {"message": "Hello, World!"}
 
 
+@app.get("/user/{user_id}")
+def get_user(user_id: int):
+    user = users.get(user_id)
+    if user is None:
+        return {"error": f"user with id {user_id} not found"}
+    return {user_id: user}
+
+
 @app.get("/file/")
-async def file():
+async def get_file():
     headers = {"Content-Disposition": "attachment; filename=index.html"}
     return FileResponse("response.html", headers=headers)
 
@@ -25,7 +35,7 @@ async def multiply(num1: int, num2: int):
 
 
 @app.post("/check_user_age")
-async def user(usr: User):
+async def check_user_age(usr: User):
     return UserAgeResponse(**usr.model_dump())
 
 
