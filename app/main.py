@@ -1,10 +1,12 @@
+from typing import List
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 
 from app.models import User
 from app.models.feedback import Feedback
-from app.models.user import UserAgeResponse
+from app.models.user import UserAgeResponse, UserCreate
 
 app = FastAPI()
 
@@ -13,6 +15,8 @@ users = {1: "ana de armas",
          3: "lenny kravitz",
          4: "hp baxxter",
          5: "morgen shtern", }
+
+users_extended: List[UserCreate] = []
 
 feedback_storage = {}
 
@@ -60,6 +64,12 @@ async def multiply(num1: int, num2: int):
 @app.post("/check_user_age")
 async def check_user_age(usr: User):
     return UserAgeResponse(**usr.model_dump())
+
+
+@app.post("/create_user")
+async def create_user(user: UserCreate):
+    users_extended.append(user)
+    return user
 
 
 if __name__ == "__main__":
