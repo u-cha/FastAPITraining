@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 
 from app.models import User
+from app.models.feedback import Feedback
 from app.models.user import UserAgeResponse
 
 app = FastAPI()
@@ -12,6 +13,8 @@ users = {1: "ana de armas",
          3: "lenny kravitz",
          4: "hp baxxter",
          5: "morgen shtern", }
+
+feedback_storage = {}
 
 
 @app.get("/")
@@ -36,6 +39,17 @@ def get_users(limit: int = 0):
 async def get_file():
     headers = {"Content-Disposition": "attachment; filename=index.html"}
     return FileResponse("response.html", headers=headers)
+
+
+@app.post("/feedback/")
+async def post_feedback(feedback: Feedback):
+    feedback_storage[feedback.name] = feedback.message
+    return {"message": f"Thank you, {feedback.name}, for your response"}
+
+
+@app.get("/feedback/{user_name}")
+async def get_feedback(user_name: str):
+    return {user_name: feedback_storage.get(user_name, "hasn't submitted feedback this far")}
 
 
 @app.get("/multiply")
